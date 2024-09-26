@@ -32,8 +32,10 @@ multi-class logistic regression pick one of the classes as a reference.
 However, the over-parametrization problem is solved by adding ridge
 regularization, that is by considering the following objective function
 $$
-f(\beta) = \left[-\sum_{i=1}^n\left\{\sum_{k=0}^{K-1}1(y_i=k)\log p_{k}(x_i; \beta)\right\} + \frac{\lambda}2\sum_{k=0}^{K-1}\sum_{j=1}^p\beta_{k,j}^2\right], \quad \mbox{where} \quad  p_k(x_i; \beta)=\frac{e^{x_i^{\top}\beta_k}}{\sum_{l=0}^{K-1} e^{x_i^{\top}\beta_l}}.
-$$ with some $\lambda >0$ over
+f(\beta) = \left[-\sum_{i=1}^n\left\{\sum_{k=0}^{K-1}1(y_i=k)\log p_{k}(x_i; \beta)\right\} + \frac{\lambda}2\sum_{k=0}^{K-1}\sum_{j=1}^p\beta_{k,j}^2\right], \quad where \quad  p_k(x_i; \beta)=\frac{e^{x_i^{\top}\beta_k}}{\sum_{l=0}^{K-1} e^{x_i^{\top}\beta_l}}.
+$$
+
+with some $\lambda >0$ over
 $\beta = (\beta_0, \dots, \beta_{K-1})\in \mathbb{R}^{p \times K}$. Here
 $1(y_i=k)$ is the indicator function, that is it is equal to one when
 $y_i=k$ and is equal to zero when $y_i \neq k$. The ridge regularization

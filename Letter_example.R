@@ -15,6 +15,8 @@ Xt <- as.matrix(letter_test[, -1])
 # [ToDo] Make sure to add column for an intercept to X and Xt
 X = cbind(1, X)
 Xt = cbind(1, Xt)
+
+library(profvis)
 # Source the LR function
 source("FunctionsLR.R")
 

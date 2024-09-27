@@ -23,10 +23,14 @@ softmax_matrix <- function(X, beta) {
   Z <- X %*% beta # n * K
   #print(beta)
   # probability matrix: n * K probabilities for each K and x
-  return(t(apply(Z, 1, function(row) {
-    exp_row <- exp(row - max(row))  
-    exp_row / sum(exp_row)
-  })))
+  Z_max <- apply(Z, 1, max)  # Find the maximum for each row
+  Z_exp <- exp(Z - Z_max)    # Subtract max and exponentiate in a vectorized way
+  Z_sum <- rowSums(Z_exp)    # Sum the exponentiated values row-wise
+  return(Z_exp / Z_sum)
+  #return(t(apply(Z, 1, function(row) {
+  #  exp_row <- exp(row - max(row))  
+  #  exp_row / sum(exp_row)
+  #})))
   #print("Z X softmat")
   #exp_Z = exp(Z)
   #return(t(
@@ -43,7 +47,7 @@ loss <- function(Y,P, beta){
   #print("ncolP")
   #print(ncol(P))
   for (k in 1:ncol(P)){
-    sum1 = sum1 + sum(log(P[,k][Y == k]))
+    sum1 = sum1 + sum(log(P[,k][Y == k - 1]))
   }
   return(-sum1 + sum(beta^2))
 }
@@ -51,7 +55,7 @@ loss <- function(Y,P, beta){
 
 result <- function(P){
   # P n * K
-  return(apply(P, 1, which.max))
+  return(max.col(P))
 }
 
 
@@ -93,14 +97,19 @@ LRMultiClass <- function(X, y, Xt, yt, numIter = 50, eta = 0.1, lambda = 1, beta
   
   n = nrow(X)
   p = ncol(X)
-  K = max(Y)
+  K = length(unique(Y))
+  
+  
 
   # Check whether beta_init is NULL. If NULL, initialize beta with p x K matrix of zeroes. If not NULL, check for compatibility of dimensions with what has been already supplied.
   if(is.null(beta_init)){
     beta_init = matrix(0, nrow = p, ncol = K)
   }else{
-    if(length(beta_init)!= ncol(X)){
+    if(nrow(beta_init)!= ncol(X)){
       stop("Length of beta doesn't match number of columns of X")
+    }
+    if(ncol(beta_init)!= K){
+      stop("Numbers of categories of beta and Y don't match")
     }
   }
   
@@ -126,7 +135,7 @@ LRMultiClass <- function(X, y, Xt, yt, numIter = 50, eta = 0.1, lambda = 1, beta
   ## Newton's method cycle - implement the update EXACTLY numIter iterations
   ##########################################################################
   for (i in 1:numIter){
-    for (k in 1:ncol(P)){
+    for (k in 1:K){
       w = P[,k]*(1 - P[,k])
       X_weighted <- sweep(X, 1, w, "*")
       
@@ -134,16 +143,17 @@ LRMultiClass <- function(X, y, Xt, yt, numIter = 50, eta = 0.1, lambda = 1, beta
       
 #     chol_decomp <- chol(XtWX)  # Perform Cholesky decomposition
 #     inv_XtWX <- chol2inv(chol_decomp)  # Get the inverse using the Cholesky factor
-      
-      beta[,k] = beta[,k] - eta * solve(XtWX + diag(lambda,p,p), t(X) %*% (P[,k] - (Y==k)) + lambda * beta[,k])
+      #print("solve")
+      #print(solve(XtWX + diag(lambda,p,p), t(X) %*% (P[,k] - (Y== k-1)) + lambda * beta[,k]))
+      beta[,k] = beta[,k] - eta * solve(XtWX + diag(lambda,p,p), t(X) %*% (P[,k] - (Y== k-1)) + lambda * beta[,k])
     }
     P = softmax_matrix(X, beta)
     #print("currentloss beta")
     #print(dim(P))
     current_loss = loss(Y,P, beta)
     test_P = softmax_matrix(Xt,beta)
-    train_res = result(P)
-    test_res = result(test_P)
+    train_res = result(P) - 1
+    test_res = result(test_P) - 1
     
     error_train[i + 1] = 100 * sum(train_res != Y)/nrow(X)
     error_test[i + 1] = 100 * sum(test_res!=Yt)/nrow(Xt)

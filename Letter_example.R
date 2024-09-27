@@ -20,9 +20,9 @@ library(profvis)
 # Source the LR function
 source("FunctionsLR.R")
 
-#profvis({
+profvis({
 out <- LRMultiClass(X, y, Xt, yt, numIter = 50, eta = 0.1, lambda = 1, beta_init = NULL)
-#})
+})
 # [ToDo] Try the algorithm LRMultiClass with lambda = 1 and 50 iterations. Call the resulting object out, i.e. out <- LRMultiClass(...)
 
 # The code below will draw pictures of objective function, as well as train/test error over the iterations

@@ -23,9 +23,18 @@ softmax_matrix <- function(X, beta) {
   Z <- X %*% beta # n * K
   #print(beta)
   # probability matrix: n * K probabilities for each K and x
-  Z_max <- apply(Z, 1, max)  # Find the maximum for each row
-  Z_exp <- exp(Z - Z_max)    # Subtract max and exponentiate in a vectorized way
-  Z_sum <- rowSums(Z_exp)    # Sum the exponentiated values row-wise
+  #Z_max <- apply(Z, 1, max)  
+  
+  # for loop to get the maximum
+  Z_max <- numeric(nrow(Z))
+  
+  for (i in 1:nrow(Z)) {
+    Z_max[i] <- max(Z[i, ])
+  }
+  
+  
+  Z_exp <- exp(Z - Z_max)   
+  Z_sum <- rowSums(Z_exp)    
   return(Z_exp / Z_sum)
   #return(t(apply(Z, 1, function(row) {
   #  exp_row <- exp(row - max(row))  

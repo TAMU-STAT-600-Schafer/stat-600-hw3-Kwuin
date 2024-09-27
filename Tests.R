@@ -1,11 +1,12 @@
 # This is a script to save your own tests for the function
 source("FunctionsLR.R")
 
-
 data_generation <- function(N, P, K, beta) {
   X <- matrix(rnorm(N * P), N, P)
-  X <- cbind(1, X)
-  
+  intercept <- matrix(1, N, 1)  
+  X <- cbind(intercept, X) 
+  print(X)
+  print(beta)
   predictors <- X %*% beta
   
   probabilities <- softmax_matrix(predictors, beta)
@@ -17,15 +18,12 @@ data_generation <- function(N, P, K, beta) {
   list(X = X, probabilities = probabilities, Y = Y)
 }
 
-
-N <- 100  
+N <- 1000  
 P <- 3    
-K <- 4    
+K <- 26
+
 beta <- matrix(rnorm((P+1) * K), P+1, K)  
 
-data <- generate_logistic_regression_data(N, P, K, beta)
+data <- data_generation(N, P, K, beta)
 
-
-head(data$X)  
-head(data$probabilities)  
-head(data$Y)
+res = LRMultiClass(data$X, data$Y, data$X, data$Y, numIter = 50, eta = 0.1, lambda = 1, beta_init = NULL)

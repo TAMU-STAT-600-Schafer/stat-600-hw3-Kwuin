@@ -55,6 +55,7 @@ loss <- function(Y,P, beta){
   sum1 = 0
   #print("ncolP")
   #print(ncol(P))
+  #sum of log likelihood
   for (k in 1:ncol(P)){
     sum1 = sum1 + sum(log(P[,k][Y == k - 1]))
   }
@@ -64,6 +65,7 @@ loss <- function(Y,P, beta){
 
 result <- function(P){
   # P n * K
+  # get the MLE estimates
   return(max.col(P))
 }
 
@@ -143,6 +145,7 @@ LRMultiClass <- function(X, y, Xt, yt, numIter = 50, eta = 0.1, lambda = 1, beta
   beta <- beta_init
   ## Newton's method cycle - implement the update EXACTLY numIter iterations
   ##########################################################################
+  
   for (i in 1:numIter){
     for (k in 1:K){
       w = P[,k]*(1 - P[,k])
@@ -150,15 +153,15 @@ LRMultiClass <- function(X, y, Xt, yt, numIter = 50, eta = 0.1, lambda = 1, beta
       
       XtWX <- t(X) %*% X_weighted
       
-#     chol_decomp <- chol(XtWX)  # Perform Cholesky decomposition
-#     inv_XtWX <- chol2inv(chol_decomp)  # Get the inverse using the Cholesky factor
       #print("solve")
       #print(solve(XtWX + diag(lambda,p,p), t(X) %*% (P[,k] - (Y== k-1)) + lambda * beta[,k]))
+      # updating step of Damped Newton
       beta[,k] = beta[,k] - eta * solve(XtWX + diag(lambda,p,p), t(X) %*% (P[,k] - (Y== k-1)) + lambda * beta[,k])
     }
     P = softmax_matrix(X, beta)
     #print("currentloss beta")
     #print(dim(P))
+    #get the MLE result and 
     current_loss = loss(Y,P, beta)
     test_P = softmax_matrix(Xt,beta)
     train_res = result(P) - 1

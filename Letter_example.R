@@ -20,6 +20,7 @@ library(profvis)
 # Source the LR function
 source("FunctionsLR.R")
 
+# calling classification function and prediction
 #profvis({
 out <- LRMultiClass(X, y, Xt, yt, numIter = 50, eta = 0.1, lambda = 1, beta_init = NULL)
 #})

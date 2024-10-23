@@ -3,7 +3,7 @@
 # Load the letter data
 #########################
 # Training data
-letter_train <- read.table("Data/letter-train.txt", header = F, colClasses = "numeric")
+letter_train <- read.table("Data/letter-train.txt", header = F, colClasses = "numeric") 
 Y <- letter_train[, 1]
 X <- as.matrix(letter_train[, -1])
 
